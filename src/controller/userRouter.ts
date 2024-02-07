@@ -91,6 +91,70 @@ export default function createUserRouter(app: App): Router {
     }
   });
 
+  router.put("/api/users", (req: Req, res: Res) => {});
+
+  router.put("/api/users/:userId", (req: Req, res: Res) => {
+    try {
+      const userId = req.id;
+
+      if (userId && !checkIfValidUUID(userId)) {
+        res.writeHead(StatusCodes.INVALID, {
+          "Content-Type": "application/json",
+        });
+        res.end(JSON.stringify({ message: "Invalid userId" }));
+        return;
+      }
+
+      const userIndex = app.getDB().findIndex((user) => user.id === userId);
+
+      if (userIndex === -1) {
+        res.writeHead(StatusCodes.NOTEXIST, {
+          "Content-Type": "application/json",
+        });
+        res.end(JSON.stringify({ message: "User not found" }));
+        return;
+      }
+
+      const body = req.body;
+      const errValidator = validateUser(body.username, body.age, body.hobbies);
+
+      const userOld = app.getDB().find((user) => user.id === userId);
+
+      if (errValidator.length > 0) {
+        res.writeHead(StatusCodes.INVALID, {
+          "Content-Type": "application/json",
+        });
+        res.end(JSON.stringify({ message: errValidator.join("; ") }));
+        return;
+      }
+
+      if (userId) {
+        const updatedUser = {
+          id: userId,
+          username:
+            body.username !== undefined ? body.username : userOld?.username,
+          age: body.age !== undefined ? body.age : userOld?.age,
+          hobbies: body.hobbies !== undefined ? body.hobbies : userOld?.hobbies,
+        };
+
+        if (userIndex !== -1) {
+          app.getDB()[userIndex] = updatedUser;
+        }
+
+        res.writeHead(StatusCodes.OK, {
+          "Content-Type": "application/json",
+        });
+        res.end(JSON.stringify(updatedUser));
+      }
+    } catch (e) {
+      console.log(e);
+      res.writeHead(StatusCodes.OTHERERR, {
+        "Content-Type": "application/json",
+      });
+      res.end(JSON.stringify({ message: "Internal Server Error" }));
+    }
+  });
+
   return router;
 }
 
@@ -129,9 +193,20 @@ const validateHobbies = (hobbies: any): string => {
 };
 
 const validateUser = (username: any, age: any, hobbies: any): string[] => {
-  return [
-    validateUsername(username),
-    validateAge(age),
-    validateHobbies(hobbies),
-  ].filter((message) => message !== "");
+  let valName = "";
+  if (username !== undefined) {
+    valName = validateUsername(username);
+  }
+
+  let valAge = "";
+  if (age !== undefined) {
+    valAge = validateAge(age);
+  }
+
+  let valHobbies = "";
+  if (hobbies !== undefined) {
+    valHobbies = validateHobbies(hobbies);
+  }
+
+  return [valName, valAge, valHobbies].filter((message) => message !== "");
 };
