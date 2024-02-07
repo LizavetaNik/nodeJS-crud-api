@@ -22,12 +22,9 @@ export default function createUserRouter(app: App): Router {
 
   router.get("/api/users/:userId", (req: Req, res: Res) => {
     try {
-      const url = req.url;
-      const parts = url ? url.split("/") : "";
-      const userIdWithColon = parts[parts.length - 1];
-      const userId = userIdWithColon.substring(1);
+      const userId = req.id;
 
-      if (!checkIfValidUUID(userId)) {
+      if (userId && !checkIfValidUUID(userId)) {
         res.writeHead(StatusCodes.INVALID, {
           "Content-Type": "application/json",
         });
@@ -97,14 +94,14 @@ export default function createUserRouter(app: App): Router {
   return router;
 }
 
+const generateUUID = (): string => {
+  return uuidv4();
+};
+
 const checkIfValidUUID = (str: string): boolean => {
   const regexExp =
     /^[0-9a-fA-F]{8}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{12}$/gi;
   return regexExp.test(str);
-};
-
-const generateUUID = (): string => {
-  return uuidv4();
 };
 
 const validateUsername = (username: any): string => {

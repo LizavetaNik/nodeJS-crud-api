@@ -9,15 +9,13 @@ class App {
   middlewares: Middleware[];
   server: http.Server<typeof IncomingMessage, typeof ServerResponse>;
   sockets: Set<any>;
-  baseUrl: string;
 
-  constructor(baseUrl: string) {
+  constructor() {
     this.db = [];
     this.emitter = new EventEmitter();
     this.middlewares = [];
     this.server = this.createServer();
     this.sockets = new Set();
-    this.baseUrl = baseUrl;
   }
 
   getDB(): User[] {
@@ -86,8 +84,11 @@ class App {
       req.on("end", () => {
         this.middlewares.forEach((middleware) => middleware(req, res, body));
 
-        const route = this.getRouteParser(req.url || "", req.method || "");
-        const emitted = this.emitter.emit(route, req, res);
+        const emitted = this.emitter.emit(
+          this.getRouteParser(req.pathname || "", req.method || ""),
+          req,
+          res
+        );
 
         if (!emitted || req.errorStatus) {
           try {
