@@ -24,4 +24,4 @@
 - DELETE `api/users/${userId}` is used to delete existing user from database
 
 For test app you can use [Postman](https://www.postman.com/). Default URL will be `http://localhost:4000/api/users`
-This app was made on the task of [RS School](https://rs.school/)
+This app was made on the task Simple CRUD API RS-NodeJS2024Q1 of [RS School](https://rs.school/)
