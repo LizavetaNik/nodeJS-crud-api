@@ -91,8 +91,6 @@ export default function createUserRouter(app: App): Router {
     }
   });
 
-  router.put("/api/users", (req: Req, res: Res) => {});
-
   router.put("/api/users/:userId", (req: Req, res: Res) => {
     try {
       const userId = req.id;
