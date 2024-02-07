@@ -24,6 +24,10 @@ class App {
     return this.db;
   }
 
+  addToDB(user: User): void {
+    this.db.push(user);
+  }
+
   use(middleware: Middleware) {
     this.middlewares.push(middleware);
   }
