@@ -26,6 +26,15 @@ class App {
     this.db.push(user);
   }
 
+  deleteToDB(id: string): boolean {
+    const index = this.db.findIndex((user) => user.id === id);
+    if (index !== -1) {
+      this.db.splice(index, 1);
+      return true;
+    }
+    return false;
+  }
+
   use(middleware: Middleware) {
     this.middlewares.push(middleware);
   }

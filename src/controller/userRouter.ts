@@ -58,9 +58,13 @@ export default function createUserRouter(app: App): Router {
   router.post("/api/users", (req: Req, res: Res) => {
     try {
       const body = req.body;
-      console.log(body.age);
-      const errValidator = validateUser(body.username, body.age, body.hobbies);
-      console.log(errValidator);
+
+      const errValidator = validateUserPost(
+        body.username,
+        body.age,
+        body.hobbies
+      );
+
       if (errValidator.length > 0) {
         res.writeHead(StatusCodes.INVALID, {
           "Content-Type": "application/json",
@@ -114,7 +118,11 @@ export default function createUserRouter(app: App): Router {
       }
 
       const body = req.body;
-      const errValidator = validateUser(body.username, body.age, body.hobbies);
+      const errValidator = validateUserPut(
+        body.username,
+        body.age,
+        body.hobbies
+      );
 
       const userOld = app.getDB().find((user) => user.id === userId);
 
@@ -150,6 +158,40 @@ export default function createUserRouter(app: App): Router {
         "Content-Type": "application/json",
       });
       res.end(JSON.stringify({ message: "Internal Server Error" }));
+    }
+  });
+
+  router.delete("/api/users/:userId", (req: Req, res: Res) => {
+    try {
+      const userId = req.id;
+
+      if (userId && !checkIfValidUUID(userId)) {
+        res.writeHead(StatusCodes.INVALID, {
+          "Content-Type": "application/json",
+        });
+        return res.end(JSON.stringify({ message: "Invalid userId" }));
+      }
+
+      if (userId) {
+        const deleted = app.deleteToDB(userId);
+        if (deleted) {
+          res.writeHead(StatusCodes.NOCONTENT);
+          return res.end();
+        } else {
+          res.writeHead(StatusCodes.NOTEXIST, {
+            "Content-Type": "application/json",
+          });
+          return res.end(JSON.stringify({ message: "User not found" }));
+        }
+      }
+
+      // If user was deleted successfully
+    } catch (e) {
+      console.log(e);
+      res.writeHead(StatusCodes.OTHERERR, {
+        "Content-Type": "application/json",
+      });
+      return res.end(JSON.stringify({ message: "Internal Server Error" }));
     }
   });
 
@@ -190,7 +232,15 @@ const validateHobbies = (hobbies: any): string => {
   return "";
 };
 
-const validateUser = (username: any, age: any, hobbies: any): string[] => {
+const validateUserPost = (username: any, age: any, hobbies: any): string[] => {
+  return [
+    validateUsername(username),
+    validateAge(age),
+    validateHobbies(hobbies),
+  ].filter((message) => message !== "");
+};
+
+const validateUserPut = (username: any, age: any, hobbies: any): string[] => {
   let valName = "";
   if (username !== undefined) {
     valName = validateUsername(username);
