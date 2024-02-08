@@ -14,6 +14,7 @@
 - `npm run start:dev` to start the server app
 - `npm run test` to run tests
 - `npm run start:prod` to build the app
+- `npm run start:multi` to start the server app with load balancer
 
 # Implemented endpoint
 

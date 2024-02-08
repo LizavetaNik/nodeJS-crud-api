@@ -5,7 +5,7 @@ import createUserRouter from "./controller/userRouter";
 
 dotenv.config();
 
-const PORT = process.env.PORT || 4000;
+const PORT = process.env.PORT || 5000;
 const BASE_URL = `http://localhost:${PORT}`;
 
 export const app = new App();
