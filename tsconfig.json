@@ -1,0 +1,16 @@
+{
+  "compilerOptions": {
+    "target": "es2018",
+    "module": "NodeNext",
+    "rootDir": "./src",
+    "allowJs": true,
+    "outDir": "./dist",
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "strict": true,
+    "skipLibCheck": true,
+    "types": ["uuid", "node", "mocha", "jest"]
+  },
+  "include": ["src/**/*"],
+  "exclude": ["jest.config.ts", "webpack.config.ts", "node_modules"]
+}
